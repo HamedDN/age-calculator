@@ -1,32 +1,36 @@
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
+
+def get_birth_date():
+    while True:
+        birth_date_str = input("Enter your birth date (YYYY-MM-DD): ")
+        try:
+            birth_date = datetime.strptime(birth_date_str, "%Y-%m-%d")
+            return birth_date
+        except ValueError:
+            print("Invalid date format. Please enter the date in YYYY-MM-DD format.")
 
 def calculate_age(birth_date):
     current_date = datetime.now()
-    age_difference = current_date - birth_date
-
-    years = age_difference.days 
-    age_difference -= timedelta(days=years*365)
-    months = age_difference.days 
-    age_difference -= timedelta(days=months*30)
-    days = age_difference.days
-    hours, remainder = divmod(age_difference.seconds, 3600)
+    age = current_date - birth_date
+    years = age.days // 365
+    remaining_days = age.days % 365
+    months = remaining_days // 30
+    days = remaining_days % 30
+    hours, remainder = divmod(age.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-    milliseconds = age_difference.microseconds
-    
+    milliseconds = age.microseconds // 1000
     return years, months, days, hours, minutes, seconds, milliseconds
 
 def main():
-    birth_date_str = input("Enter your birth date (YYYY-MM-DD): ")
-    birth_date = datetime.strptime(birth_date_str, "%Y-%m-%d")
-    
-    while True:
-        years, months, days, hours, minutes, seconds, milliseconds = calculate_age(birth_date)
-        print(f"You are {years} Y, {months} M, {days} D, {hours} h, {minutes} m, {seconds} s, {milliseconds} ms  old", end='\r')
-        time.sleep(0.001)
+    birth_date = get_birth_date()
 
-if __name__ == "__main__":
     try:
-        main()
+        while True:
+            age_components = calculate_age(birth_date)
+            formatted_age = "You are {:03d} years {:02d} months {:02d} days {:02d} hours {:02d} minutes {:02d} seconds {:03d} milliseconds old".format(*age_components)
+            print("\r" + formatted_age, end='', flush=True)
     except KeyboardInterrupt:
         print("\nExiting program.")
+
+if __name__ == "__main__":
+    main()
